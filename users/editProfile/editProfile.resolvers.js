@@ -7,16 +7,16 @@ export default {
     editProfile: async (
       _,
       { firstName, lastName, username, email, password: newPassword },
-      { token }
+      { loggedInUser }
     ) => {
-      const { id } = await jwt.verify(token, process.env.SECRET_KEY);
+      console.log(loggedInUser);
       let uglyPassword = null;
       if (newPassword) {
         uglyPassword = await bcrypt.hash(newPassword, 10);
       }
-      const updateUser = await client.user.update({
+      const updatedUser = await client.user.update({
         where: {
-          id,
+          id: loggedInUser.id,
         },
         data: {
           firstName,
@@ -26,7 +26,7 @@ export default {
           ...(uglyPassword && { password: uglyPassword }), //password: uglyPassword 이 코드와 같음
         },
       });
-      if (updateUser.id) {
+      if (updatedUser.id) {
         return {
           ok: true,
         };
